@@ -29,6 +29,8 @@ default config = {
     library_path_marker = nil,
     -- Path marker for pip dependencies within the external directory
     pip_deps_marker = nil,
+    -- Path to location for the global pyright config. If not defined, local configs will be used
+    global_pyright_config = nil,
     -- Root markers for Bazel build files
     lsp_root_markers = { "BUILD.bazel", "BUILD" },
     -- Root markers for monorepo workspace

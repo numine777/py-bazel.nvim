@@ -14,17 +14,18 @@ vim.api.nvim_create_autocmd({ "BufEnter" }, {
 	group = py_bazel,
 })
 
-vim.api.nvim_create_autocmd({ "BufLeave" }, {
-	pattern = { "*.py" },
-	callback = function()
-		require("py-bazel.paths").remove_symlink()
-	end,
-	group = py_bazel,
-})
+-- vim.api.nvim_create_autocmd({ "BufLeave" }, {
+-- 	pattern = { "*.py" },
+-- 	callback = function()
+-- 		require("py-bazel.paths").remove_symlink()
+-- 	end,
+-- 	group = py_bazel,
+-- })
 
 local defaults = {
 	library_path_marker = nil,
     pip_deps_marker = nil,
+    global_pyright_config = nil,
 	lsp_root_markers = { "BUILD.bazel", "BUILD" },
 	workspace_root_markers = { "WORKSPACE", "WORKSPACE.bazel" },
 }

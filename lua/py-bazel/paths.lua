@@ -4,6 +4,7 @@ local log = require("py-bazel.dev").log
 local Job = require("plenary.job")
 local Path = require("plenary.path")
 local Config = require("py-bazel").plugin_config
+local uv = vim.loop
 
 local data_path = vim.fn.stdpath("data")
 
@@ -95,10 +96,16 @@ local function find_external_deps(workspace_root)
 	local external_dir = Path:new(bazel_output_root .. "/" .. "external")
 	if Config.pip_deps_marker ~= nil then
 		local pip_dir = Path:new(external_dir .. "/" .. Config.pip_deps_marker)
-		for dir, _ in vim.fs.dir(pip_dir:absolute()) do
-			local dir_path = Path:new(pip_dir .. "/" .. dir):absolute()
-			table.insert(dirs, dir_path)
-		end
+        if Path.exists(pip_dir) then
+            for dir, _ in vim.fs.dir(pip_dir:absolute()) do
+                log.warn(uv.fs_stat(Path:new(pip_dir .. "/" .. dir):absolute()))
+                local dir_path = Path:new(pip_dir .. "/" .. dir):absolute()
+                if uv.fs_stat(dir_path) then
+                    dir_path = uv.fs_readlink(dir_path)
+                end
+                table.insert(dirs, dir_path)
+            end
+        end
 	end
 	return dirs
 end
@@ -118,7 +125,11 @@ function M.find_extra_paths()
 			local dirs = vim.list_extend(py_dirs, find_external_deps(workspace_root))
 			require("py-bazel.config").update_config(config, dirs)
 		end
-		require("py-bazel.config").set_local_config(config, lsp_root)
+        local config_target = lsp_root
+        if Config.global_pyright_config ~= nil then
+            config_target = Config.global_pyright_config
+        end
+		require("py-bazel.config").set_local_config(config, config_target)
 	else
 		log.info("This does not appear to be a bazel project")
 	end
