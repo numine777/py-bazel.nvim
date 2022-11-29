@@ -100,7 +100,8 @@ local function find_external_deps(workspace_root)
             for dir, _ in vim.fs.dir(pip_dir:absolute()) do
                 log.warn(uv.fs_stat(Path:new(pip_dir .. "/" .. dir):absolute()))
                 local dir_path = Path:new(pip_dir .. "/" .. dir):absolute()
-                if uv.fs_stat(dir_path) then
+                local stat = uv.fs_stat(dir_path)
+                if stat ~= nil and stat.nlink == 4 then
                     dir_path = uv.fs_readlink(dir_path)
                 end
                 table.insert(dirs, dir_path)

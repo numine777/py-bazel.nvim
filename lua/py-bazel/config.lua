@@ -5,7 +5,9 @@ local Config = require("py-bazel").plugin_config
 function M.update_config(config, dirs)
 	local pyright_config = { extraPaths = {} }
 	if Config.global_pyright_config ~= nil then
-		pyright_config = vim.fn.json_decode(Path:new(Config.global_pyright_config):read()) or {}
+		if Path.exists(Path:new(Config.global_pyright_config)) then
+			pyright_config = vim.fn.json_decode(Path:new(Config.global_pyright_config):read()) or {}
+		end
 	end
 	if Path.exists(config) then
 		pyright_config = vim.tbl_deep_extend("force", pyright_config, vim.fn.json_decode(config:read()) or {})
