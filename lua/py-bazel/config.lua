@@ -27,7 +27,7 @@ end
 function M.set_local_config(config, config_target)
 	local target_path = Path:new(config_target)
 	local stat = uv.fs_stat(config_target)
-	if Path.exists(target_path) and stat ~= nil and stat.nlink ~= 4 then
+	if Path.exists(target_path) and stat ~= nil and stat.nlink == 0 then
 		target_path:rename({ new_name = config_target .. ".bak" })
 	end
 	return vim.fn.system({ "ln", "-sf", config:absolute(), config_target })
