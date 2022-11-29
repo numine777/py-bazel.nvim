@@ -88,6 +88,21 @@ local function get_cached_config(workspace_root)
 	return created, Path:new(data_path .. "/py-bazel/" .. vim.fs.basename(workspace_root) .. "/pyrightconfig.json")
 end
 
+local function find_external_deps(workspace_root)
+	local dirs = {}
+	local bazel_output_name = "bazel-" .. vim.fs.basename(workspace_root)
+	local bazel_output_root = Path:new(workspace_root .. "/" .. bazel_output_name):absolute()
+	local external_dir = Path:new(bazel_output_root .. "/" .. "external")
+	if Config.pip_deps_marker ~= nil then
+		local pip_dir = Path:new(external_dir .. "/" .. Config.pip_deps_marker)
+		for dir, _ in vim.fs.dir(pip_dir:absolute()) do
+			local dir_path = Path:new(pip_dir .. "/" .. dir):absolute()
+			table.insert(dirs, dir_path)
+		end
+	end
+	return dirs
+end
+
 function M.find_extra_paths()
 	local lsp_root = require("py-bazel.lsp").find_bazel_root_marker()
 	if lsp_root ~= nil then
@@ -99,7 +114,8 @@ function M.find_extra_paths()
 		local created, config = get_cached_config(workspace_root)
 		if created then
 			local files = find_user_defined_libs(workspace_root)
-			local dirs = find_py_dirs(files)
+			local py_dirs = find_py_dirs(files)
+			local dirs = vim.list_extend(py_dirs, find_external_deps(workspace_root))
 			require("py-bazel.config").update_config(config, dirs)
 		end
 		require("py-bazel.config").set_local_config(config, lsp_root)

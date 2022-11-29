@@ -13,7 +13,7 @@
 
 ## Installation
 Using packer
-```
+```lua
 use({
     "numine777/py-bazel.nvim", 
     config = function() 
@@ -23,10 +23,15 @@ use({
 ```
 
 ## Configuration
-```
+```lua
 default config = {
+    -- Path marker for directories that contain python libraries 
 	library_path_marker = nil,
+    -- Path marker for pip dependencies within the external directory
+    pip_deps_marker = nil,
+    -- Root markers for Bazel build files
 	lsp_root_markers = { "BUILD.bazel", "BUILD" },
+    -- Root markers for monorepo workspace
 	workspace_root_markers = { "WORKSPACE", "WORKSPACE.bazel" },
 }
 ```

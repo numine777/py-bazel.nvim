@@ -24,6 +24,7 @@ vim.api.nvim_create_autocmd({ "BufLeave" }, {
 
 local defaults = {
 	library_path_marker = nil,
+    pip_deps_marker = nil,
 	lsp_root_markers = { "BUILD.bazel", "BUILD" },
 	workspace_root_markers = { "WORKSPACE", "WORKSPACE.bazel" },
 }
