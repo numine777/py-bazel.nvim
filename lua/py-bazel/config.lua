@@ -1,6 +1,7 @@
 local M = {}
 local Path = require("plenary.path")
 local Config = require("py-bazel").plugin_config
+local uv = vim.loop
 
 function M.update_config(config, dirs)
 	local pyright_config = { extraPaths = {} }
@@ -24,6 +25,11 @@ function M.update_config(config, dirs)
 end
 
 function M.set_local_config(config, config_target)
+	local target_path = Path:new(config_target)
+	local stat = uv.fs_stat(config_target)
+	if Path.exists(target_path) and stat ~= nil and stat.nlink ~= 4 then
+		target_path:rename({ new_name = config_target .. ".bak" })
+	end
 	return vim.fn.system({ "ln", "-sf", config:absolute(), config_target })
 end
 
